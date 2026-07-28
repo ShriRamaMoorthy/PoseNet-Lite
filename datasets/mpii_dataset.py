@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Any
 import cv2
 from .base_dataset import BasePoseDataset
-
+from sample import PoseSample
 
 class MPIIDataset(BasePoseDataset):
     def __init__(self, root_dir:str|Path, annotations: list[dict[str,Any]],transforms:Any = None)->None:
@@ -15,12 +15,13 @@ class MPIIDataset(BasePoseDataset):
     def __getitem__(self, index:int)->dict[str,Any]:
         annotation = self.annotations[index]
         image = self._load_image(annotation)
-        sample = {
-            "image":image,
-            "keypoints":annotation['keypoints'],
-            "visibility":annotation['visibility'],
-            "bbox":annotation['bbox']
-        }
+        sample = PoseSample(
+            image=image,
+            keypoints=annotation.keypoints,
+            visibility=annotation.visibility,
+            bbox=annotation.bbox,
+            image_id=annotation.image_path.name
+        )
 
         if self.transform is not None:
             sample = self.transform(sample)
