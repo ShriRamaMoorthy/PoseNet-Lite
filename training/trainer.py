@@ -52,4 +52,16 @@ def validate_one_epoch(
 
     with torch.no_grad():
         for batch in progress_bar:
-            
+            images = batch['image'].to(device)
+            heatmaps = batch['image'].to(device)
+            predictions = model(images)
+            loss = criterion(predictions,heatmaps)
+            running_loss+=loss.item()
+
+            progress_bar.set_postfix(loss = loss.item())
+
+    average_loss = running_loss / len(dataloader)
+
+    return {
+        'loss' : average_loss
+    }
